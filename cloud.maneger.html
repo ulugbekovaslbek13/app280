@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <title>Cloud Manager Junior</title>
+    <style>
+        :root { --bg: #0f172a; --accent: #38bdf8; --card: #1e293b; --white: #f8fafc; }
+        body { background: var(--bg); color: var(--white); font-family: 'Segoe UI', sans-serif; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; background: var(--card); border-radius: 12px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; padding-bottom: 15px; }
+        .upload-section { margin: 20px 0; display: flex; gap: 10px; }
+        input[type="text"] { flex: 1; padding: 10px; border-radius: 6px; border: none; background: #0f172a; color: white; outline: 2px solid #334155; }
+        button { background: var(--accent); color: #0f172a; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        .file-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; margin-top: 20px; }
+        .file-item { background: #334155; padding: 15px; border-radius: 8px; text-align: center; position: relative; transition: 0.3s; }
+        .file-item:hover { transform: scale(1.05); background: #475569; }
+        .file-icon { font-size: 40px; display: block; margin-bottom: 10px; }
+        .delete-file { position: absolute; top: 5px; right: 5px; color: #ef4444; cursor: pointer; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h2>📁 Cloud Manager v1.0</h2>
+        <span id="fileCount">Fayllar: 0</span>
+    </div>
+
+    <div class="upload-section">
+        <input type="text" id="fileName" placeholder="Fayl nomi (masalan: portfolio.pdf)">
+        <button onclick="addFile()">YUKLASH ⬆️</button>
+    </div>
+
+    <div class="file-list" id="fileList"></div>
+</div>
+
+<script>
+    // Ma'lumotlarni xotiradan olish
+    let files = JSON.parse(localStorage.getItem('cloudFiles')) || [];
+
+    function updateUI() {
+        const list = document.getElementById('fileList');
+        const count = document.getElementById('fileCount');
+        list.innerHTML = '';
+        
+        files.forEach((file, index) => {
+            const ext = file.split('.').pop();
+            let icon = '📄';
+            if(['jpg','png','gif'].includes(ext)) icon = '🖼️';
+            if(['mp4','mov'].includes(ext)) icon = '🎥';
+            if(['zip','rar'].includes(ext)) icon = '📦';
+
+            list.innerHTML += `
+                <div class="file-item">
+                    <span class="delete-file" onclick="deleteFile(${index})">×</span>
+                    <span class="file-icon">${icon}</span>
+                    <span style="font-size: 12px; word-break: break-all;">${file}</span>
+                </div>
+            `;
+        });
+        
+        count.innerText = `Fayllar: ${files.length}`;
+        localStorage.setItem('cloudFiles', JSON.stringify(files));
+    }
+
+    function addFile() {
+        const input = document.getElementById('fileName');
+        if(input.value.trim() !== '') {
+            files.push(input.value);
+            input.value = '';
+            updateUI();
+        }
+    }
+
+    function deleteFile(index) {
+        files.splice(index, 1);
+        updateUI();
+    }
+
+    updateUI();
+</script>
+
+</body>
+</html>
